@@ -336,7 +336,8 @@ es necesario verificar el resultado antes de usarlo como evidencia.
 La entrega principal es el notebook integrado:
 
 ``` text
-C09_2026_10_14_Estrategias_de_Recuperación.md
+C09_2026_10_14_Estrategias_de_Recuperación_y_Prototipo_Corte2.md
+capturas_pantalla
 Clase_07_Indice_y_Corpus.zip
 Clase_08_Evidencia_RAG.json
 Clase_09_Evidencia_Evaluacion_RAG.zip
