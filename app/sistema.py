@@ -1,19 +1,19 @@
 """
 Coordinación del asistente normativo.
 
-Código migrado del notebook asistente_normativo_RAG_agente_MCP.ipynb (puntos 1
-a 6) con la menor cantidad de cambios posible. Solo se adaptó lo que exige la
-aplicación web de Gradio (app.py):
+Código migrado del notebook asistente_normativo_RAG_agente_MCP.ipynb con la 
+menor cantidad de cambios posible. Solo se adaptó lo que exige laaplicación
+web de Gradio (app.py):
 
-- Configuración: se lee de app/.env en lugar de los secretos de Colab
-  (userdata), el JSON subido (files.upload) y los parámetros de formulario.
+- Configuración: se lee de app/.env en lugar de los secretos de Colab,
+  el JSON subido (files.upload) y los parámetros de formulario.
 - Identidad: cada sesión de Gradio inicia sesión con su propia cuenta de
   Supabase Auth. No hay un cliente global de Supabase: cada solicitud usa un
   cliente creado con el token del usuario (cliente_usuario).
 - Corpus: se lee el corpus compartido (migración 002) en lugar del corpus del
   propietario, para que cualquier usuario autenticado pueda consultarlo.
 - Memoria: MEMORIA y guardar_turno() se reemplazan por el historial guardado en
-  Supabase (almacenamiento.py). EJECUCIONES no se usa: en una aplicación web
+  Supabase (almacenamiento.py). EJECUCIONES no se usa, en una aplicación web
   mezclaría las trazas de todos los usuarios.
 - Preparación: el modelo de embeddings, Node.js y el descubrimiento MCP se
   preparan al arrancar, fuera de la atención de preguntas (preparar()).
