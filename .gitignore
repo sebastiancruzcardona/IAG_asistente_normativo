@@ -1,3 +1,8 @@
 .env
 AGENTS.md
 .gitignore
+.mcp.json
+.venv/
+__pycache__/
+*.pyc
+*.sqlite3*
