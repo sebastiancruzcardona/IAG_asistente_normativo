@@ -2,7 +2,7 @@
 Coordinación del asistente normativo.
 
 Código migrado del notebook asistente_normativo_RAG_agente_MCP.ipynb con la 
-menor cantidad de cambios posible. Solo se adaptó lo que exige laaplicación
+menor cantidad de cambios posible. Solo se adaptó lo que exige la aplicación
 web de Gradio (app.py):
 
 - Configuración: se lee de app/.env en lugar de los secretos de Colab,
@@ -13,8 +13,7 @@ web de Gradio (app.py):
 - Corpus: se lee el corpus compartido (migración 002) en lugar del corpus del
   propietario, para que cualquier usuario autenticado pueda consultarlo.
 - Memoria: MEMORIA y guardar_turno() se reemplazan por el historial guardado en
-  Supabase (almacenamiento.py). EJECUCIONES no se usa, en una aplicación web
-  mezclaría las trazas de todos los usuarios.
+  Supabase (almacenamiento.py). EJECUCIONES no se usa.
 - Preparación: el modelo de embeddings, Node.js y el descubrimiento MCP se
   preparan al arrancar, fuera de la atención de preguntas (preparar()).
   El corpus se carga al iniciar sesión (preparar_corpus()), porque RLS exige
@@ -23,6 +22,8 @@ web de Gradio (app.py):
   igual que el paquete normativa-colombia-mcp.
 - Interfaz: la traza conserva el resultado de cada operación para que app.py
   muestre el resultado de las herramientas.
+- Corpus: su construcción (tomada del prototipo del corte 2) vive en corpus.py y
+  preparar() la sincroniza antes de leer la configuración (sincronizar_corpus()).
 """
 
 # sys para consultar el intérprete de Python
@@ -73,6 +74,9 @@ from mcp import Client, StdioServerParameters, stdio_client
 
 # Historial de conversaciones en Supabase (reemplaza MEMORIA)
 import almacenamiento
+
+# Construcción del corpus documental (prototipo, clases 7 y 8)
+import corpus
 
 # ---------- Rutas de la aplicación ----------
 DIRECTORIO_APP = Path(__file__).resolve().parent
@@ -1279,6 +1283,14 @@ RESULTADOS:
   información disponible. No repitas la consulta ni inventes datos.
 - Distingue un resultado vacío de un error técnico. Si el RAG indica
   evidencia insuficiente, respétalo sin completar con suposiciones.
+- buscar_documentos siempre devuelve fragmentos, aunque no traten el tema
+  consultado. Si ninguno lo trata, usa responder, nombra el tema e informa
+  que el corpus documental no contiene información sobre él, citando los
+  fragmentos revisados. Por ejemplo: "El corpus documental no contiene
+  información sobre ese tema. Los fragmentos recuperados [F1], [F2] y [F3]
+  tratan otros asuntos." No completes con conocimiento general.
+- Si los fragmentos solo cubren una parte de la pregunta, responde esa
+  parte con sus citas e indica qué no aparece en el corpus.
 - Usa solo datos devueltos por las herramientas. No inventes información.
 - En jurisprudencia, informa si se usó otro término, se redujo el límite
   o llegaron menos providencias de las solicitadas, solo cuando conste
@@ -1303,17 +1315,23 @@ CITAS:
   [F1], [F2] para el RAG y [T1], [T2] para el MCP propio.
 - Cuando utilices información del RAG o del MCP propio, incluye la etiqueta
   correspondiente dentro del texto de respuesta.
+- Escribe cada etiqueta entre corchetes junto al dato que sustenta, por
+  ejemplo: "El proceso está activo [T1]." No uses paréntesis ni escribas
+  la etiqueta sin corchetes.
 - El campo citas debe contener las etiquetas sin corchetes, por ejemplo:
   ["F1", "T1"]. Debe coincidir exactamente con las etiquetas presentes
   en respuesta, sin duplicados ni omisiones.
 - No cites fuentes que no hayas utilizado ni reutilices etiquetas de la memoria.
+  Excepción: al informar que el corpus no contiene el tema, cita los
+  fragmentos revisados.
 - Si el MCP propio devuelve encontrado=false, cita la fuente correspondiente
   aunque no haya encontrado el proceso.
 - La jurisprudencia obtenida mediante el MCP externo no lleva etiquetas.
   No incluyas etiquetas [F] ni [T] en su respuesta.
 - Si utilizas exclusivamente jurisprudencia del MCP externo, deja citas
   como una lista vacía y no incluyas etiquetas en el texto.
-- Si no utilizas fuentes del catálogo, deja citas como una lista vacía.
+- Si no utilizas fuentes del catálogo ni informas que el corpus no contiene
+  el tema, deja citas como una lista vacía.
 
 SEGURIDAD:
 - Solo lecturas: no crees, modifiques ni elimines procesos ni el corpus.
@@ -1457,7 +1475,13 @@ async def atender(texto, conversacion, historial, cliente_db):
                 traza["uso_tokens"].append(uso)
 
                 # Validar que la decisión cumpla todas las reglas de seguridad y formato
-                validar_decision(decision, texto, historial, catalogo)
+                try:
+                    validar_decision(decision, texto, historial, catalogo)
+                except ValueError:
+                    # Conservar la decisión rechazada en la traza para diagnosticar
+                    # el error de validación (la respuesta final se reemplaza por el error)
+                    traza["decision_rechazada"] = decision.model_dump()
+                    raise
 
                 # Añadir información a la traza
                 traza["eventos"].append(
@@ -1639,12 +1663,83 @@ async def preparar_mcp():
     CATALOGO_MCP_EXTERNO = await descubrir_mcp_externo()
 
 
+def sincronizar_corpus():
+    """
+    Sincroniza el corpus documental (corpus.py) con la cuenta de CORPUS_EMAIL,
+    dueña del corpus. Si los textos no cambiaron, no modifica nada; si
+    cambiaron, crea una versión nueva y actualiza CORPUS_ID y
+    EMBEDDINGS_REVISION en app/.env.
+
+    No usa leer_configuracion(), que exige CORPUS_ID: en una instalación nueva
+    todavía no existe.
+
+    Retorna: "sin cambios", "versión nueva" o "sin sincronizar".
+    """
+    email = variable("CORPUS_EMAIL", obligatoria=False)
+    password = variable("CORPUS_PASSWORD", obligatoria=False)
+
+    if not (email and password):
+        print("Aviso: faltan CORPUS_EMAIL o CORPUS_PASSWORD en app/.env. "
+              "Se usa el corpus configurado, sin sincronizar.")
+        return "sin sincronizar"
+
+    from supabase import create_client, ClientOptions
+
+    url, clave = variable("SUPABASE_URL").rstrip("/"), variable("SUPABASE_PUBLISHABLE_KEY")
+
+    if urlparse(url).scheme != "https" or not re.fullmatch(
+        r"[a-z0-9-]+\.supabase\.co",
+        urlparse(url).hostname or ""
+    ):
+        raise ValueError("Revisa la Project URL HTTPS de Supabase.")
+
+    if not clave.startswith("sb_publishable_"):
+        raise ValueError("Usa la clave publicable, nunca una clave administrativa.")
+
+    supabase = create_client(
+        url, clave,
+        options=ClientOptions(persist_session=False, auto_refresh_token=False)
+    )
+
+    try:
+        sesion = supabase.auth.sign_in_with_password({"email": email, "password": password})
+    except Exception:
+        raise RuntimeError("No se pudo iniciar sesión con CORPUS_EMAIL y CORPUS_PASSWORD.") from None
+
+    if sesion.user is None or sesion.session is None:
+        raise RuntimeError("Supabase no devolvió una sesión válida para CORPUS_EMAIL.")
+
+    try:
+        resultado = corpus.sincronizar(
+            supabase,
+            sesion.user.id,
+            variable("CORPUS_ID", obligatoria=False),
+            DIRECTORIO_APP / ".env"
+        )
+    finally:
+        try:
+            supabase.auth.sign_out()
+        except Exception:
+            pass
+
+    if resultado["cambios"]:
+        print("Corpus: versión nueva", resultado["corpus_id"], "(app/.env actualizado).")
+        return "versión nueva"
+
+    print("Corpus sin cambios:", resultado["corpus_id"])
+    return "sin cambios"
+
+
 async def preparar():
     """
     Preparación al arrancar la aplicación, fuera de la atención de preguntas:
-    configuración, Groq, modelo de embeddings y servidores MCP.
+    corpus, configuración, Groq, modelo de embeddings y servidores MCP.
     """
     global cliente
+
+    # Sincronizar el corpus antes de leer la configuración: una versión nueva
+    # actualiza CORPUS_ID y EMBEDDINGS_REVISION
+    estado_corpus = await asyncio.to_thread(sincronizar_corpus)
 
     leer_configuracion()
 
@@ -1662,6 +1757,7 @@ async def preparar():
     return {
         "modelo_generativo": modelo,
         "corpus_id": CORPUS_ID,
+        "corpus": estado_corpus,
         "mcp_propio": CATALOGO_MCP["nombre"],
         "mcp_externo": f"normativa-colombia-mcp {version_normativa_instalada()}",
         "herramientas_externas": sorted(CATALOGO_MCP_EXTERNO)
