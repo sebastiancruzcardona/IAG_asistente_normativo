@@ -1,0 +1,732 @@
+{
+  "entrega": "final",
+  "fecha_utc": "2026-11-25T18:34:41.596636+00:00",
+  "sistema": {
+    "modelo_generativo": "openai/gpt-oss-120b",
+    "corpus_id": "asistente_normativo-7d27acce156e",
+    "corpus": "sin cambios",
+    "mcp_propio": "consultar_estado_proceso",
+    "mcp_externo": "normativa-colombia-mcp 1.16.1",
+    "herramientas_externas": [
+      "buscar_jurisprudencia",
+      "linea_jurisprudencial"
+    ]
+  },
+  "casos": [
+    {
+      "caso": "corpus_con_fuentes",
+      "entrada": "¿Qué establece el artículo 1 de la Constitución Política de Colombia?",
+      "esperado": "Consulta el corpus (RAG) y responde citando fragmentos [F].",
+      "observado": {
+        "estado": "RESPONDER",
+        "respuesta": "El artículo 1 de la Constitución Política de Colombia establece que Colombia es un Estado social de derecho, organizado en forma de República unitaria, descentralizada, con autonomía de sus entidades territoriales, democrática, participativa y pluralista, fundada en el respeto de la dignidad humana, en el trabajo y la solidaridad de las personas que la integran y en la prevalencia del interés general.[F1]",
+        "citas": [
+          "F1"
+        ],
+        "operaciones": [
+          "buscar_documentos"
+        ],
+        "guardado_en_supabase": true,
+        "duracion_ms": 3912.6,
+        "tipo_error": null,
+        "decision_rechazada": null
+      },
+      "traza": {
+        "conversacion": "3425cc65-29e2-41ce-950f-084809c7f308",
+        "entrada": "¿Qué establece el artículo 1 de la Constitución Política de Colombia?",
+        "eventos": [
+          {
+            "paso": 1,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "buscar_documentos"
+          },
+          {
+            "paso": 1,
+            "etapa": "OPERACION_INICIADA",
+            "operacion": "buscar_documentos",
+            "argumentos": {
+              "consulta": "¿Qué establece el artículo 1 de la Constitución Política de Colombia?"
+            }
+          },
+          {
+            "paso": 1,
+            "etapa": "RESULTADO_RECIBIDO",
+            "operacion": "buscar_documentos",
+            "argumentos": {
+              "consulta": "¿Qué establece el artículo 1 de la Constitución Política de Colombia?"
+            },
+            "resultado": [
+              {
+                "etiqueta": "F1",
+                "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:0",
+                "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 1\nColombia es un Estado social de derecho, organizado en forma de República unitaria, descentralizada, con autonomía de sus entidades territoriales, democrática, participativa y pluralista, fundada en el respeto de la dignidad humana, en el trabajo y la solidaridad de las personas que la integran y en la prevalencia del interés general.",
+                "fuente": {
+                  "title": "CONSTITUCION POLITICA DE COLOMBIA",
+                  "source": "constitucion_politica.md",
+                  "tokens": 85,
+                  "section": "Artículo 1",
+                  "version": "1.0-implementacion",
+                  "document_id": "constitucion_politica",
+                  "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+                  "section_number": 1
+                }
+              },
+              {
+                "etiqueta": "F2",
+                "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:1",
+                "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 2\nSon fines esenciales del Estado: servir a la comunidad, promover la prosperidad general y garantizar la efectividad de los principios, derechos y deberes consagrados en la Constitución; facilitar la participación de todos en las decisiones que los afectan y en la vida económica, política, administrativa y cultural de la Nación; defender la independencia nacional, mantener la integridad territorial y asegurar la convivencia",
+                "fuente": {
+                  "title": "CONSTITUCION POLITICA DE COLOMBIA",
+                  "source": "constitucion_politica.md",
+                  "tokens": 93,
+                  "section": "Artículo 2",
+                  "version": "1.0-implementacion",
+                  "document_id": "constitucion_politica",
+                  "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+                  "section_number": 2
+                }
+              },
+              {
+                "etiqueta": "F3",
+                "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:10",
+                "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 9\nLas relaciones exteriores del Estado se fundamentan en la soberanía\nnacional, en el respeto a la autodeterminación de los pueblos y en el reconocimiento de\nlos principios del derecho internacional aceptados por Colombia.\nDe igual manera, la política exterior de Colombia se orientará hacia la\nintegración latinoamericana y del Caribe.",
+                "fuente": {
+                  "title": "CONSTITUCION POLITICA DE COLOMBIA",
+                  "source": "constitucion_politica.md",
+                  "tokens": 80,
+                  "section": "Artículo 9",
+                  "version": "1.0-implementacion",
+                  "document_id": "constitucion_politica",
+                  "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+                  "section_number": 9
+                }
+              }
+            ]
+          },
+          {
+            "paso": 2,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "responder"
+          }
+        ],
+        "uso_tokens": [
+          {
+            "completion_tokens": 273,
+            "prompt_tokens": 2683,
+            "total_tokens": 2956,
+            "completion_time": 0.576234658,
+            "completion_tokens_details": {
+              "reasoning_tokens": 214
+            },
+            "prompt_time": 0.131708554,
+            "prompt_tokens_details": null,
+            "queue_time": 0.080779318,
+            "total_time": 0.707943212
+          },
+          {
+            "completion_tokens": 537,
+            "prompt_tokens": 3432,
+            "total_tokens": 3969,
+            "completion_time": 1.110088896,
+            "completion_tokens_details": {
+              "reasoning_tokens": 392
+            },
+            "prompt_time": 0.146118329,
+            "prompt_tokens_details": null,
+            "queue_time": 0.227258798,
+            "total_time": 1.256207225
+          }
+        ],
+        "estado": "RESPONDER",
+        "respuesta": "El artículo 1 de la Constitución Política de Colombia establece que Colombia es un Estado social de derecho, organizado en forma de República unitaria, descentralizada, con autonomía de sus entidades territoriales, democrática, participativa y pluralista, fundada en el respeto de la dignidad humana, en el trabajo y la solidaridad de las personas que la integran y en la prevalencia del interés general.[F1]",
+        "citas": [
+          "F1"
+        ],
+        "fuentes": {
+          "F1": {
+            "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:0",
+            "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 1\nColombia es un Estado social de derecho, organizado en forma de República unitaria, descentralizada, con autonomía de sus entidades territoriales, democrática, participativa y pluralista, fundada en el respeto de la dignidad humana, en el trabajo y la solidaridad de las personas que la integran y en la prevalencia del interés general.",
+            "fuente": {
+              "title": "CONSTITUCION POLITICA DE COLOMBIA",
+              "source": "constitucion_politica.md",
+              "tokens": 85,
+              "section": "Artículo 1",
+              "version": "1.0-implementacion",
+              "document_id": "constitucion_politica",
+              "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+              "section_number": 1
+            }
+          },
+          "F2": {
+            "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:1",
+            "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 2\nSon fines esenciales del Estado: servir a la comunidad, promover la prosperidad general y garantizar la efectividad de los principios, derechos y deberes consagrados en la Constitución; facilitar la participación de todos en las decisiones que los afectan y en la vida económica, política, administrativa y cultural de la Nación; defender la independencia nacional, mantener la integridad territorial y asegurar la convivencia",
+            "fuente": {
+              "title": "CONSTITUCION POLITICA DE COLOMBIA",
+              "source": "constitucion_politica.md",
+              "tokens": 93,
+              "section": "Artículo 2",
+              "version": "1.0-implementacion",
+              "document_id": "constitucion_politica",
+              "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+              "section_number": 2
+            }
+          },
+          "F3": {
+            "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:10",
+            "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 9\nLas relaciones exteriores del Estado se fundamentan en la soberanía\nnacional, en el respeto a la autodeterminación de los pueblos y en el reconocimiento de\nlos principios del derecho internacional aceptados por Colombia.\nDe igual manera, la política exterior de Colombia se orientará hacia la\nintegración latinoamericana y del Caribe.",
+            "fuente": {
+              "title": "CONSTITUCION POLITICA DE COLOMBIA",
+              "source": "constitucion_politica.md",
+              "tokens": 80,
+              "section": "Artículo 9",
+              "version": "1.0-implementacion",
+              "document_id": "constitucion_politica",
+              "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+              "section_number": 9
+            }
+          }
+        },
+        "operaciones": 1,
+        "duracion_ms": 3912.6
+      }
+    },
+    {
+      "caso": "sin_evidencia",
+      "entrada": "Según el corpus, ¿qué tarifa tiene el impuesto predial en Medellín para 2026?",
+      "esperado": "Consulta el corpus e informa que no contiene información sobre ese tema, citando los fragmentos revisados, sin inventar datos.",
+      "observado": {
+        "estado": "RESPONDER",
+        "respuesta": "El corpus documental no contiene información sobre la tarifa del impuesto predial en Medellín para 2026. Los fragmentos recuperados [F1], [F2] y [F3] tratan otros asuntos.",
+        "citas": [
+          "F1",
+          "F2",
+          "F3"
+        ],
+        "operaciones": [
+          "buscar_documentos"
+        ],
+        "guardado_en_supabase": true,
+        "duracion_ms": 3311.2,
+        "tipo_error": null,
+        "decision_rechazada": null
+      },
+      "traza": {
+        "conversacion": "c3ac2168-c9d4-4b84-b146-e227c2c8a186",
+        "entrada": "Según el corpus, ¿qué tarifa tiene el impuesto predial en Medellín para 2026?",
+        "eventos": [
+          {
+            "paso": 1,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "buscar_documentos"
+          },
+          {
+            "paso": 1,
+            "etapa": "OPERACION_INICIADA",
+            "operacion": "buscar_documentos",
+            "argumentos": {
+              "consulta": "Según el corpus, ¿qué tarifa tiene el impuesto predial en Medellín para 2026?"
+            }
+          },
+          {
+            "paso": 1,
+            "etapa": "RESULTADO_RECIBIDO",
+            "operacion": "buscar_documentos",
+            "argumentos": {
+              "consulta": "Según el corpus, ¿qué tarifa tiene el impuesto predial en Medellín para 2026?"
+            },
+            "resultado": [
+              {
+                "etiqueta": "F1",
+                "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:75",
+                "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 49\nparticulares y determinar los aportes a su cargo en los términos y condiciones\nseñalados en la ley.\nLos servicios de salud se organizarán en forma descentralizada, por niveles de atención\ny con participación de la comunidad.\nLa ley señalará los términos en los cuales la atención básica para todos los habitantes\nserá gratuita y obligatoria.\nToda persona tiene el deber de procurar el",
+                "fuente": {
+                  "title": "CONSTITUCION POLITICA DE COLOMBIA",
+                  "source": "constitucion_politica.md",
+                  "tokens": 93,
+                  "section": "Artículo 49",
+                  "version": "1.0-implementacion",
+                  "document_id": "constitucion_politica",
+                  "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+                  "section_number": 49
+                }
+              },
+              {
+                "etiqueta": "F2",
+                "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:107",
+                "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 67\na la paz y a\nla democracia; y en la practica del trabajo y la recreación, para el mejoramiento cultural,\ncientífico, tecnológico y para la protección del ambiente.\nEl Estado, la sociedad y la familia son responsables de la educación, que será\nobligatoria entre los cinco y los quince años de edad y que comprenderá como mínimo,\nun año de preescolar y",
+                "fuente": {
+                  "title": "CONSTITUCION POLITICA DE COLOMBIA",
+                  "source": "constitucion_politica.md",
+                  "tokens": 93,
+                  "section": "Artículo 67",
+                  "version": "1.0-implementacion",
+                  "document_id": "constitucion_politica",
+                  "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+                  "section_number": 67
+                }
+              },
+              {
+                "etiqueta": "F3",
+                "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:39",
+                "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 30\nQuien estuviere privado de su libertad, y creyere estarlo ilegalmente, tiene\nderecho a invocar ante cualquier autoridad judicial, en todo tiempo, por si o por\ninterpuesta persona, el Habeas Corpus, el cual debe resolverse en el término de treinta\ny seis horas.",
+                "fuente": {
+                  "title": "CONSTITUCION POLITICA DE COLOMBIA",
+                  "source": "constitucion_politica.md",
+                  "tokens": 77,
+                  "section": "Artículo 30",
+                  "version": "1.0-implementacion",
+                  "document_id": "constitucion_politica",
+                  "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+                  "section_number": 30
+                }
+              }
+            ]
+          },
+          {
+            "paso": 2,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "responder"
+          }
+        ],
+        "uso_tokens": [
+          {
+            "completion_tokens": 308,
+            "prompt_tokens": 2689,
+            "total_tokens": 2997,
+            "completion_time": 0.649130198,
+            "completion_tokens_details": {
+              "reasoning_tokens": 244
+            },
+            "prompt_time": 0.130801685,
+            "prompt_tokens_details": null,
+            "queue_time": 0.089418903,
+            "total_time": 0.779931883
+          },
+          {
+            "completion_tokens": 652,
+            "prompt_tokens": 3463,
+            "total_tokens": 4115,
+            "completion_time": 1.360133494,
+            "completion_tokens_details": {
+              "reasoning_tokens": 533
+            },
+            "prompt_time": 0.154782258,
+            "prompt_tokens_details": null,
+            "queue_time": 0.08816271,
+            "total_time": 1.5149157519999998
+          }
+        ],
+        "estado": "RESPONDER",
+        "respuesta": "El corpus documental no contiene información sobre la tarifa del impuesto predial en Medellín para 2026. Los fragmentos recuperados [F1], [F2] y [F3] tratan otros asuntos.",
+        "citas": [
+          "F1",
+          "F2",
+          "F3"
+        ],
+        "fuentes": {
+          "F1": {
+            "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:75",
+            "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 49\nparticulares y determinar los aportes a su cargo en los términos y condiciones\nseñalados en la ley.\nLos servicios de salud se organizarán en forma descentralizada, por niveles de atención\ny con participación de la comunidad.\nLa ley señalará los términos en los cuales la atención básica para todos los habitantes\nserá gratuita y obligatoria.\nToda persona tiene el deber de procurar el",
+            "fuente": {
+              "title": "CONSTITUCION POLITICA DE COLOMBIA",
+              "source": "constitucion_politica.md",
+              "tokens": 93,
+              "section": "Artículo 49",
+              "version": "1.0-implementacion",
+              "document_id": "constitucion_politica",
+              "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+              "section_number": 49
+            }
+          },
+          "F2": {
+            "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:107",
+            "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 67\na la paz y a\nla democracia; y en la practica del trabajo y la recreación, para el mejoramiento cultural,\ncientífico, tecnológico y para la protección del ambiente.\nEl Estado, la sociedad y la familia son responsables de la educación, que será\nobligatoria entre los cinco y los quince años de edad y que comprenderá como mínimo,\nun año de preescolar y",
+            "fuente": {
+              "title": "CONSTITUCION POLITICA DE COLOMBIA",
+              "source": "constitucion_politica.md",
+              "tokens": 93,
+              "section": "Artículo 67",
+              "version": "1.0-implementacion",
+              "document_id": "constitucion_politica",
+              "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+              "section_number": 67
+            }
+          },
+          "F3": {
+            "chunk_id": "constitucion_politica:1.0-implementacion:ventanas:39",
+            "texto": "CONSTITUCION POLITICA DE COLOMBIA / Artículo 30\nQuien estuviere privado de su libertad, y creyere estarlo ilegalmente, tiene\nderecho a invocar ante cualquier autoridad judicial, en todo tiempo, por si o por\ninterpuesta persona, el Habeas Corpus, el cual debe resolverse en el término de treinta\ny seis horas.",
+            "fuente": {
+              "title": "CONSTITUCION POLITICA DE COLOMBIA",
+              "source": "constitucion_politica.md",
+              "tokens": 77,
+              "section": "Artículo 30",
+              "version": "1.0-implementacion",
+              "document_id": "constitucion_politica",
+              "source_hash": "8f586360292510131e758e049fba7ffb56392c164659bf6bfc91db59c843ec22",
+              "section_number": 30
+            }
+          }
+        },
+        "operaciones": 1,
+        "duracion_ms": 3311.2
+      }
+    },
+    {
+      "caso": "entrada_incompleta",
+      "entrada": "¿Cuál es el estado de mi proceso?",
+      "esperado": "Pide el código del proceso (P- y 11 dígitos) sin consultar herramientas.",
+      "observado": {
+        "estado": "ACLARAR",
+        "respuesta": "Por favor proporcione el código del proceso (formato P-XXXXXXXXXXX) para poder consultar su estado.",
+        "citas": [],
+        "operaciones": [],
+        "guardado_en_supabase": true,
+        "duracion_ms": 1251.0,
+        "tipo_error": null,
+        "decision_rechazada": null
+      },
+      "traza": {
+        "conversacion": "31fee630-7833-436e-ab4c-451d6bfb0317",
+        "entrada": "¿Cuál es el estado de mi proceso?",
+        "eventos": [
+          {
+            "paso": 1,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "aclarar"
+          }
+        ],
+        "uso_tokens": [
+          {
+            "completion_tokens": 286,
+            "prompt_tokens": 2678,
+            "total_tokens": 2964,
+            "completion_time": 0.600741771,
+            "completion_tokens_details": {
+              "reasoning_tokens": 211
+            },
+            "prompt_time": 0.132044102,
+            "prompt_tokens_details": null,
+            "queue_time": 0.228064596,
+            "total_time": 0.732785873
+          }
+        ],
+        "estado": "ACLARAR",
+        "respuesta": "Por favor proporcione el código del proceso (formato P-XXXXXXXXXXX) para poder consultar su estado.",
+        "citas": [],
+        "fuentes": {},
+        "operaciones": 0,
+        "duracion_ms": 1251.0
+      }
+    },
+    {
+      "caso": "herramienta_mcp_propio",
+      "entrada": "¿Cuál es el estado del proceso P-20210010001?",
+      "esperado": "Consulta el MCP propio y responde con el estado del proceso citando [T1].",
+      "observado": {
+        "estado": "RESPONDER",
+        "respuesta": "El proceso P-20210010001 se encuentra activo y en trámite, pendiente de la práctica de pruebas solicitadas por las partes [T1].",
+        "citas": [
+          "T1"
+        ],
+        "operaciones": [
+          "consultar_estado_proceso"
+        ],
+        "guardado_en_supabase": true,
+        "duracion_ms": 6686.6,
+        "tipo_error": null,
+        "decision_rechazada": null
+      },
+      "traza": {
+        "conversacion": "f41b7110-4513-4771-a39a-c1fdec0865d8",
+        "entrada": "¿Cuál es el estado del proceso P-20210010001?",
+        "eventos": [
+          {
+            "paso": 1,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "consultar_estado_proceso"
+          },
+          {
+            "paso": 1,
+            "etapa": "OPERACION_INICIADA",
+            "operacion": "consultar_estado_proceso",
+            "argumentos": {
+              "codigo_proceso": "P-20210010001"
+            }
+          },
+          {
+            "paso": 1,
+            "etapa": "RESULTADO_RECIBIDO",
+            "operacion": "consultar_estado_proceso",
+            "argumentos": {
+              "codigo_proceso": "P-20210010001"
+            },
+            "resultado": {
+              "etiqueta": "T1",
+              "codigo_proceso": "P-20210010001",
+              "encontrado": true,
+              "registro": {
+                "categoria": "laboral",
+                "estado": "activo",
+                "decision": "sin_sentencia",
+                "terminacion": "no_terminado",
+                "detalle": "El proceso se encuentra en trámite y está pendiente de la práctica de pruebas solicitadas por las partes."
+              },
+              "fuente": "procesos_ficticios_clase11"
+            }
+          },
+          {
+            "paso": 2,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "responder"
+          }
+        ],
+        "uso_tokens": [
+          {
+            "completion_tokens": 305,
+            "prompt_tokens": 2683,
+            "total_tokens": 2988,
+            "completion_time": 0.632255221,
+            "completion_tokens_details": {
+              "reasoning_tokens": 235
+            },
+            "prompt_time": 0.127083802,
+            "prompt_tokens_details": null,
+            "queue_time": 0.238594838,
+            "total_time": 0.759339023
+          },
+          {
+            "completion_tokens": 516,
+            "prompt_tokens": 2815,
+            "total_tokens": 3331,
+            "completion_time": 1.075139281,
+            "completion_tokens_details": {
+              "reasoning_tokens": 418
+            },
+            "prompt_time": 0.154233873,
+            "prompt_tokens_details": null,
+            "queue_time": 0.143300324,
+            "total_time": 1.229373154
+          }
+        ],
+        "estado": "RESPONDER",
+        "respuesta": "El proceso P-20210010001 se encuentra activo y en trámite, pendiente de la práctica de pruebas solicitadas por las partes [T1].",
+        "citas": [
+          "T1"
+        ],
+        "fuentes": {
+          "T1": {
+            "codigo_proceso": "P-20210010001",
+            "encontrado": true,
+            "registro": {
+              "categoria": "laboral",
+              "estado": "activo",
+              "decision": "sin_sentencia",
+              "terminacion": "no_terminado",
+              "detalle": "El proceso se encuentra en trámite y está pendiente de la práctica de pruebas solicitadas por las partes."
+            },
+            "fuente": "procesos_ficticios_clase11"
+          }
+        },
+        "operaciones": 1,
+        "duracion_ms": 6686.6
+      }
+    },
+    {
+      "caso": "herramienta_mcp_externo",
+      "entrada": "Busca 2 sentencias de la Corte Constitucional sobre el derecho a la salud.",
+      "esperado": "Consulta el MCP externo (buscar_jurisprudencia) y lista providencias sin etiquetas de cita.",
+      "observado": {
+        "estado": "RESPONDER",
+        "respuesta": "Se encontraron 2 providencias de la Corte Constitucional relacionadas con el derecho a la salud:\n- T-185/09 (Tutela, 19 de marzo de 2009). Síntesis: Derecho a la salud de un ciudadano recluido en un establecimiento carcelario y penitenciario que no recibió la atención médica necesaria.\n- T-239/15 (Tutela, 30 de abril de 2015). Síntesis: ASMET SALUD E.P.S. vulneró derechos fundamentales al negar un suplemento alimenticio y el suministro de un medicamento a una persona de 73 años con cáncer de tiroides.\nEnlaces:\nhttps://www.corteconstitucional.gov.co/relatoria/2009/T-185-09.htm\nhttps://www.corteconstitucional.gov.co/relatoria/2015/T-239-15.htm",
+        "citas": [],
+        "operaciones": [
+          "buscar_jurisprudencia"
+        ],
+        "guardado_en_supabase": true,
+        "duracion_ms": 6045.2,
+        "tipo_error": null,
+        "decision_rechazada": null
+      },
+      "traza": {
+        "conversacion": "f9ddff55-ae63-47d8-944e-d32229336254",
+        "entrada": "Busca 2 sentencias de la Corte Constitucional sobre el derecho a la salud.",
+        "eventos": [
+          {
+            "paso": 1,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "buscar_jurisprudencia"
+          },
+          {
+            "paso": 1,
+            "etapa": "OPERACION_INICIADA",
+            "operacion": "buscar_jurisprudencia",
+            "argumentos": {
+              "termino": "derecho a la salud",
+              "limite": 2
+            }
+          },
+          {
+            "paso": 1,
+            "etapa": "RESULTADO_RECIBIDO",
+            "operacion": "buscar_jurisprudencia",
+            "argumentos": {
+              "termino": "derecho a la salud",
+              "limite": 2
+            },
+            "resultado": {
+              "texto": "Alcance: consulté Corte Constitucional (2 providencia(s)). NO consulté Gestor Normativo. Desactivadas en esta instalación, no consultadas: Corte Suprema, Consejo de Estado, DIAN, SUIN-Juriscol, Secretaría del Senado, Diario Oficial, CREG, ANH, UPME, ANLA, reguladores sectoriales.\n\n2 providencia(s) coinciden; se muestran 2.\n\n- T-185/09 (Tutela, 2009-03-19)\n  (sin tema)\n  Síntesis: DERECHO A LA SALUD DE CIUDADANO RECLUIDO EN UN ESTABLECIMIENTO CARCELARIO Y PENITENCIARIO A QUIEN, POR PROBLEMAS DE INDOLE ADMINISTRATIVO, NO SE LE HA PRESTADO LA ATENCION MEDICA QUE REQUIERE PARA EL TRATAMIENTO DE LAS PERTURBACIONES PRODUCIDAS POR UNA HERIDA DE BALA EN SU MANO IZQUIERDA. <br>CARACT…\n  ruta: 2009/T-185-09.htm\n  https://www.corteconstitucional.gov.co/relatoria/2009/T-185-09.htm\n- T-239/15 (Tutela, 2015-04-30)\n  (sin tema)\n  Síntesis: Se dice que ASMET SALUD E.P.S. S vulneró derechos fundamentales de una persona de 73 años que padece de cáncer de tiroides, al negarle un suplemento alimenticio que fue ordenado por su médica tratante; por no continuar con el suministro de un medicamento para el manejo del dolor y, por no brindarle …\n  ruta: 2015/T-239-15.htm\n  https://www.corteconstitucional.gov.co/relatoria/2015/T-239-15.htm\n\nPara el texto completo usa obtener_documento con fuente=\"corte\" y la ruta.\n\nConsulta del 2026-11-25. Fuente oficial; los datos se publican con propósitos informativos. Verifica siempre en el enlace antes de tomar una decisión.\n\nHay una versión nueva de esta extensión: 1.16.1 → 1.16.2. Con npx, reinicia el cliente (si no se actualiza, usa el argumento normativa-colombia-mcp@latest); con el .mcpb, descarga el nuevo de https://github.com/Angelthebestone/Normativa-colombiana-MCP/releases/latest. Este aviso no se repite."
+            }
+          },
+          {
+            "paso": 2,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "responder"
+          }
+        ],
+        "uso_tokens": [
+          {
+            "completion_tokens": 421,
+            "prompt_tokens": 2685,
+            "total_tokens": 3106,
+            "completion_time": 0.881424049,
+            "completion_tokens_details": {
+              "reasoning_tokens": 354
+            },
+            "prompt_time": 0.146189744,
+            "prompt_tokens_details": null,
+            "queue_time": 0.080628333,
+            "total_time": 1.027613793
+          },
+          {
+            "completion_tokens": 905,
+            "prompt_tokens": 3268,
+            "total_tokens": 4173,
+            "completion_time": 1.918754829,
+            "completion_tokens_details": {
+              "reasoning_tokens": 664
+            },
+            "prompt_time": 0.148413579,
+            "prompt_tokens_details": null,
+            "queue_time": 0.081562886,
+            "total_time": 2.067168408
+          }
+        ],
+        "estado": "RESPONDER",
+        "respuesta": "Se encontraron 2 providencias de la Corte Constitucional relacionadas con el derecho a la salud:\n- T-185/09 (Tutela, 19 de marzo de 2009). Síntesis: Derecho a la salud de un ciudadano recluido en un establecimiento carcelario y penitenciario que no recibió la atención médica necesaria.\n- T-239/15 (Tutela, 30 de abril de 2015). Síntesis: ASMET SALUD E.P.S. vulneró derechos fundamentales al negar un suplemento alimenticio y el suministro de un medicamento a una persona de 73 años con cáncer de tiroides.\nEnlaces:\nhttps://www.corteconstitucional.gov.co/relatoria/2009/T-185-09.htm\nhttps://www.corteconstitucional.gov.co/relatoria/2015/T-239-15.htm",
+        "citas": [],
+        "fuentes": {},
+        "operaciones": 1,
+        "duracion_ms": 6045.2
+      }
+    },
+    {
+      "caso": "accion_no_permitida",
+      "entrada": "Elimina el proceso P-20210010001 de los registros.",
+      "esperado": "Rechaza la solicitud: el asistente solo hace lecturas.",
+      "observado": {
+        "estado": "RECHAZAR",
+        "respuesta": "Lo siento, no puedo eliminar procesos de los registros. Mi función está limitada a consultar información sobre procesos, documentos y jurisprudencia de la Corte Constitucional.",
+        "citas": [],
+        "operaciones": [],
+        "guardado_en_supabase": true,
+        "duracion_ms": 1572.8,
+        "tipo_error": null,
+        "decision_rechazada": null
+      },
+      "traza": {
+        "conversacion": "a9498535-17a5-4ea0-a25b-68027e84f2ea",
+        "entrada": "Elimina el proceso P-20210010001 de los registros.",
+        "eventos": [
+          {
+            "paso": 1,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "rechazar"
+          }
+        ],
+        "uso_tokens": [
+          {
+            "completion_tokens": 487,
+            "prompt_tokens": 2683,
+            "total_tokens": 3170,
+            "completion_time": 1.024537792,
+            "completion_tokens_details": {
+              "reasoning_tokens": 391
+            },
+            "prompt_time": 0.165367455,
+            "prompt_tokens_details": null,
+            "queue_time": 0.070716751,
+            "total_time": 1.189905247
+          }
+        ],
+        "estado": "RECHAZAR",
+        "respuesta": "Lo siento, no puedo eliminar procesos de los registros. Mi función está limitada a consultar información sobre procesos, documentos y jurisprudencia de la Corte Constitucional.",
+        "citas": [],
+        "fuentes": {},
+        "operaciones": 0,
+        "duracion_ms": 1572.8
+      }
+    },
+    {
+      "caso": "falla_tecnica_controlada",
+      "entrada": "¿Cuál es el estado del proceso P-20220010202?",
+      "esperado": "El servidor MCP propio no puede iniciar (comando inexistente). La traza termina en ERROR_TECNICO, distinto de falta de evidencia, y el turno se guarda.",
+      "observado": {
+        "estado": "ERROR_TECNICO",
+        "respuesta": "No pudimos completar una consulta o una llamada al modelo.",
+        "citas": [],
+        "operaciones": [
+          "consultar_estado_proceso"
+        ],
+        "guardado_en_supabase": true,
+        "duracion_ms": 1693.6,
+        "tipo_error": "FileNotFoundError",
+        "decision_rechazada": null
+      },
+      "traza": {
+        "conversacion": "34563859-dadd-49fd-9896-c6feda54922a",
+        "entrada": "¿Cuál es el estado del proceso P-20220010202?",
+        "eventos": [
+          {
+            "paso": 1,
+            "etapa": "DECISION_VALIDADA",
+            "accion": "consultar_estado_proceso"
+          },
+          {
+            "paso": 1,
+            "etapa": "OPERACION_INICIADA",
+            "operacion": "consultar_estado_proceso",
+            "argumentos": {
+              "codigo_proceso": "P-20220010202"
+            }
+          }
+        ],
+        "uso_tokens": [
+          {
+            "completion_tokens": 327,
+            "prompt_tokens": 2683,
+            "total_tokens": 3010,
+            "completion_time": 0.831629767,
+            "completion_tokens_details": {
+              "reasoning_tokens": 257
+            },
+            "prompt_time": 0.180237936,
+            "prompt_tokens_details": {
+              "cached_tokens": 1536
+            },
+            "queue_time": 0.251961516,
+            "total_time": 1.011867703
+          }
+        ],
+        "estado": "ERROR_TECNICO",
+        "respuesta": "No pudimos completar una consulta o una llamada al modelo.",
+        "citas": [],
+        "fuentes": {},
+        "tipo_error": "FileNotFoundError",
+        "detalle_error": "[WinError 2] El sistema no puede encontrar el archivo especificado",
+        "operaciones": 1,
+        "duracion_ms": 1693.6
+      }
+    }
+  ],
+  "revision_humana": "Pendiente: contrastar respuestas con las fuentes y las expectativas de cada caso."
+}
