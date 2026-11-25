@@ -422,7 +422,7 @@ IAG_asistente_normativo/
 │   ├── prototipo_asistente_normativo_corte2.ipynb origen de corpus.py
 │   └── notebooks de las clases 3, 4, 6, 7 y 8
 ├── evidencias/                                 evidencias de las clases 7, 8, 9 y 11, y de la entrega final
-├── bitacoras/                                  bitácoras de las clases 6, 9 y 11, plantilla y capturas
+├── bitacoras/                                  bitacora del prototipo del segundo corte
 └── app/
     ├── README.md                               contenido de la carpeta app/
     ├── app.py                                  interfaz Gradio
