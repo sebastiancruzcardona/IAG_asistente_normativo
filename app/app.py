@@ -221,7 +221,8 @@ def recorrido(traza):
         clave: traza.get(clave)
         for clave in (
             "estado", "eventos", "operaciones", "duracion_ms",
-            "uso_tokens", "tipo_error", "detalle_error", "respuesta"
+            "uso_tokens", "tipo_error", "detalle_error", "respuesta",
+            "decision_rechazada"
         )
         if traza.get(clave) not in (None, "", [])
     }
