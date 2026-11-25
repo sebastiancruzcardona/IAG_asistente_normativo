@@ -53,6 +53,89 @@ CSS = """
 #chat button[aria-label="Limpiar chat"], #chat button[title="Limpiar chat"] {
     display: none !important;
 }
+
+/* Panel de conversaciones: la fila estira sus columnas al alto de la columna
+   del chat (equal_height de Gradio estiraría también el botón). Dentro del
+   panel solo crece la lista, que se desplaza sin mover su etiqueta */
+#fila_chat {
+    align-items: stretch !important;
+}
+#lateral > * {
+    flex-grow: 0;
+}
+/* Gradio envuelve gr.Radio en un contenedor .form: ese contenedor es el que
+   ocupa el alto restante del panel. !important porque Gradio le asigna
+   flex-grow como estilo en línea */
+#lateral > .form {
+    flex: 1 1 0 !important;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+#conversaciones {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+#conversaciones .wrap {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    align-content: flex-start;
+}
+
+/* Inicio de sesión centrado verticalmente en la ventana. No se cambia
+   display: Gradio lo usa para ocultar la vista al iniciar sesión */
+#vista_login {
+    min-height: 85vh;
+    justify-content: center;
+}
+
+/* Animación de carga del inicio de sesión: el elemento transparente ocupa la
+   misma celda que el botón, así que la animación cubre solo el botón */
+#zona_boton {
+    display: grid !important;
+}
+#zona_boton > * {
+    grid-area: 1 / 1;
+}
+#carga_login {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    color: transparent;
+    font-size: 0;
+    line-height: 0;
+    min-height: 0 !important;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--button-large-radius, var(--radius-lg));
+    pointer-events: none;
+    z-index: 2;
+}
+/* Oscurece un poco el botón mientras carga, como en el chat */
+#carga_login .wrap {
+    background: rgba(0, 0, 0, 0.35) !important;
+    border-radius: inherit;
+}
+
+/* Título del inicio de sesión: más grande, centrado y sin espacio sobrante */
+#titulo_login {
+    text-align: center;
+    padding: 0;
+}
+#titulo_login h1 {
+    font-size: 2.4rem;
+    margin: 0;
+}
+
+/* Usuario actual más cerca del botón Nueva conversación */
+#usuario p {
+    margin: 0;
+}
 """
 
 
@@ -338,8 +421,18 @@ async def iniciar(email, password):
 
 
 async def salir(sesion):
+    """
+    Cierra la sesión y restablece la vista. Además de vista_inicio(), limpia
+    el correo y la entrada del chat, y vuelve a habilitar el envío por si se
+    canceló una respuesta en curso (que deja la entrada bloqueada).
+    """
     await asyncio.to_thread(sistema.cerrar_sesion, sesion)
-    return vista_inicio("Sesión cerrada.")
+    return (
+        *vista_inicio("Sesión cerrada."),
+        "",  # correo
+        gr.update(value="", interactive=True),  # entrada
+        gr.update(interactive=True)  # boton_enviar
+    )
 
 
 def nueva_conversacion():
@@ -472,64 +565,91 @@ def mostrar_fuentes_mensaje(info, evento: gr.SelectData):
 # ---------- Interfaz ----------
 
 def construir_interfaz():
-    with gr.Blocks(title="Asistente normativo") as demo:
+    # fill_width: la aplicación ocupa todo el ancho de la ventana, con el
+    # margen por defecto de Gradio (16 px arriba y abajo, 32 px a los lados)
+    with gr.Blocks(title="Asistente normativo", fill_width=True) as demo:
         sesion = gr.State(None)
         conversacion = gr.State(None)
         info_mensajes = gr.State([])
         pendiente = gr.State("")
 
-        # Encabezado: título a la izquierda y cierre de sesión a la derecha,
-        # alineado con el borde derecho del panel lateral
-        with gr.Row():
-            gr.Markdown(
-                "# Asistente normativo\n"
-                "Consultas sobre el corpus documental, procesos judiciales ficticios "
-                "y jurisprudencia de la Corte Constitucional de Colombia."
-            )
-            boton_salir = gr.Button("Cerrar sesión", size="sm", scale=0, min_width=120, visible=False)
+        # Inicio de sesión: título grande y centrado, y debajo una columna
+        # central de un tercio del ancho (la página ocupa toda la ventana, así
+        # que la mitad sería demasiado ancha)
+        with gr.Column(visible=True, elem_id="vista_login") as vista_login:
+            gr.Markdown("# Asistente normativo", elem_id="titulo_login")
+            with gr.Row():
+                gr.Column(scale=1, min_width=0)
+                with gr.Column(scale=1, min_width=280):
+                    correo = gr.Textbox(label="Correo", max_lines=1)
+                    clave = gr.Textbox(label="Contraseña", type="password", max_lines=1)
+                    # El botón y un elemento transparente comparten la misma celda:
+                    # la animación de carga se muestra solo sobre el botón (un
+                    # gr.Button no muestra su propia animación)
+                    with gr.Column(elem_id="zona_boton"):
+                        boton_login = gr.Button("Iniciar sesión", variant="primary")
+                        carga_login = gr.HTML("&nbsp;", elem_id="carga_login")
+                    mensaje_login = gr.Markdown()
+                gr.Column(scale=1, min_width=0)
 
-        # Inicio de sesión: columna central de la mitad del ancho
-        with gr.Row(visible=True) as vista_login:
-            gr.Column(scale=1, min_width=0)
-            with gr.Column(scale=2, min_width=280):
-                correo = gr.Textbox(label="Correo", max_lines=1)
-                clave = gr.Textbox(label="Contraseña", type="password", max_lines=1)
-                boton_login = gr.Button("Iniciar sesión", variant="primary")
-                mensaje_login = gr.Markdown()
-            gr.Column(scale=1, min_width=0)
-
-        with gr.Row(visible=False) as vista_chat:
-            with gr.Column(scale=1, min_width=220):
-                usuario = gr.HTML()
-                boton_nueva = gr.Button("Nueva conversación", variant="primary")
-                selector = gr.Radio(label="Conversaciones", choices=[], value=None)
-
-            with gr.Column(scale=3):
-                chatbot = gr.Chatbot(
-                    label="Conversación",
-                    elem_id="chat",
-                    height=560,
-                    buttons=["copy"],
-                    placeholder="Escribe una pregunta para comenzar una conversación."
+        with gr.Column(visible=False) as vista_chat:
+            # Encabezado: título y descripción a la izquierda y cierre de sesión
+            # a la derecha, alineado con el borde derecho del panel lateral
+            with gr.Row():
+                gr.Markdown(
+                    "# Asistente normativo\n"
+                    "Consultas sobre el corpus documental, procesos judiciales ficticios "
+                    "y jurisprudencia de la Corte Constitucional de Colombia."
                 )
-                with gr.Row():
-                    entrada = gr.Textbox(
-                        show_label=False,
-                        placeholder="Ejemplo: ¿Cuál es el estado del proceso P-20210010001?",
-                        max_lines=4,
-                        scale=5
-                    )
-                    boton_enviar = gr.Button("Enviar", variant="primary", scale=1)
-                aviso = gr.Markdown()
+                boton_salir = gr.Button("Cerrar sesión", size="sm", scale=0, min_width=120, visible=False)
 
-            with gr.Column(scale=2, min_width=260):
-                estado = gr.Markdown()
-                with gr.Accordion("Fuentes", open=True):
-                    fuentes = gr.Markdown()
-                with gr.Accordion("Herramientas", open=True):
-                    herramientas = gr.Markdown()
-                with gr.Accordion("Recorrido", open=False):
-                    traza = gr.JSON(label="Traza")
+            with gr.Row():
+                # Conversaciones y chat (proporción 1:4). Con el CSS de #fila_chat,
+                # el panel de conversaciones termina a la altura de la entrada
+                with gr.Column(scale=5):
+                    with gr.Row(elem_id="fila_chat"):
+                        with gr.Column(scale=1, min_width=220, elem_id="lateral"):
+                            usuario = gr.HTML(elem_id="usuario")
+                            boton_nueva = gr.Button("Nueva conversación", variant="primary")
+                            selector = gr.Radio(
+                                label="Conversaciones", choices=[], value=None,
+                                elem_id="conversaciones"
+                            )
+    
+                        with gr.Column(scale=4):
+                            # Alto relativo a la ventana: la página completa cabe en la
+                            # pantalla sin desplazarse y el chat aprovecha el ancho
+                            chatbot = gr.Chatbot(
+                                label="Conversación",
+                                elem_id="chat",
+                                height="60vh",
+                                buttons=["copy"],
+                                placeholder="Escribe una pregunta para comenzar una conversación."
+                            )
+                            with gr.Row():
+                                entrada = gr.Textbox(
+                                    show_label=False,
+                                    placeholder="Ejemplo: ¿Cuál es el estado del proceso P-20210010001?",
+                                    max_lines=4,
+                                    scale=5
+                                )
+                                boton_enviar = gr.Button("Enviar", variant="primary", scale=1)
+    
+                    # Aviso bajo el chat, fuera de la fila de igual alto, para que
+                    # no cambie dónde termina el panel de conversaciones
+                    with gr.Row():
+                        gr.Column(scale=1, min_width=220)
+                        with gr.Column(scale=4):
+                            aviso = gr.Markdown()
+    
+                with gr.Column(scale=2, min_width=260):
+                    estado = gr.Markdown()
+                    with gr.Accordion("Fuentes", open=True):
+                        fuentes = gr.Markdown()
+                    with gr.Accordion("Herramientas", open=True):
+                        herramientas = gr.Markdown()
+                    with gr.Accordion("Recorrido", open=False):
+                        traza = gr.JSON(label="Traza")
 
         salida_vista = [
             sesion, conversacion, info_mensajes, pendiente,
@@ -542,10 +662,8 @@ def construir_interfaz():
         for disparador in (boton_login.click, clave.submit):
             disparador(
                 iniciar, [correo, clave], salida_vista + [clave],
-                show_progress_on=mensaje_login
+                show_progress="full", show_progress_on=carga_login
             )
-
-        boton_salir.click(salir, [sesion], salida_vista, show_progress_on=chatbot)
 
         # Conversaciones
         boton_nueva.click(
@@ -561,19 +679,29 @@ def construir_interfaz():
 
         # Envío de la pregunta: primero se muestra, luego se responde.
         # La animación de carga se muestra solo en el chat
+        envios = []
         for disparador in (boton_enviar.click, entrada.submit):
-            disparador(
-                preparar_envio, [entrada, chatbot, info_mensajes],
-                [pendiente, chatbot, info_mensajes, entrada, boton_enviar, aviso],
-                show_progress="hidden"
-            ).success(
-                responder, [sesion, conversacion, pendiente, chatbot, info_mensajes],
-                [sesion, conversacion, chatbot, info_mensajes, selector,
-                 estado, fuentes, herramientas, traza, aviso, entrada, boton_enviar],
-                show_progress_on=chatbot
+            envios.append(
+                disparador(
+                    preparar_envio, [entrada, chatbot, info_mensajes],
+                    [pendiente, chatbot, info_mensajes, entrada, boton_enviar, aviso],
+                    show_progress="hidden"
+                ).success(
+                    responder, [sesion, conversacion, pendiente, chatbot, info_mensajes],
+                    [sesion, conversacion, chatbot, info_mensajes, selector,
+                     estado, fuentes, herramientas, traza, aviso, entrada, boton_enviar],
+                    show_progress_on=chatbot
+                )
             )
 
         chatbot.select(mostrar_fuentes_mensaje, [info_mensajes], [estado, fuentes, herramientas, traza])
+
+        # Cerrar sesión cancela una respuesta en curso: si no, al terminar
+        # volvería a escribir la sesión anterior en gr.State
+        boton_salir.click(
+            salir, [sesion], salida_vista + [correo, entrada, boton_enviar],
+            show_progress_on=chatbot, cancels=envios
+        )
 
     return demo
 
