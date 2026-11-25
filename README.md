@@ -22,7 +22,7 @@ El asistente normativo es una aplicación web, construida con Gradio, que acompa
 10. [Instalación desde un clon limpio](#10-instalación-desde-un-clon-limpio)
 11. [Variables de entorno](#11-variables-de-entorno)
 12. [Ejecución](#12-ejecución)
-13. [Pruebas](#13-pruebas)
+13. [Pruebas del sistema](#13-pruebas-del-sistema)
 14. [Despliegue](#14-despliegue)
 15. [Problemas frecuentes](#15-problemas-frecuentes)
 16. [Limitaciones](#16-limitaciones)
@@ -57,7 +57,7 @@ El objetivo de esta entrega final es reunir en una sola aplicación web el traba
 - Los expedientes reales, ya que es un ejercicio académico y no se tiene acceso a una base de datos real de procesos de un juzgado.
 - La creación, modificación o eliminación de procesos.
 - La modificación de documentos del corpus o eliminación de conversaciones por parte de los usuarios en tiempo de ejecución de la aplicación.
-- El registro de nuevas cuentas. Porque se hace manualmente desde Supabase.
+- El registro de nuevas cuentas desde la aplicación, porque las cuentas se crean manualmente en Supabase.
 - La jurisprudencia de cortes distintas a la Corte Constitucional, los autos y la verificación de la vigencia de una sentencia.
 - La asesoría jurídica definitiva, puesto que toda respuesta necesita revisión humana.
 - El despliegue en un servicio de alojamiento, porque esta entrega se ejecuta en local (ver la sección 14).
@@ -156,7 +156,7 @@ Los embeddings se calculan con `sentence-transformers/paraphrase-multilingual-Mi
 
 La función `buscar_documentos` combina dos búsquedas. Por un lado, la búsqueda semántica en Supabase, mediante la función `buscar_fragmentos_compartidos`, trae diez candidatos. Por otro, BM25 (`rank-bm25`) trae otros diez a partir del corpus cargado en memoria. Después, RRF fusiona ambos rankings con una constante de 60, y de esa fusión se conservan los tres mejores fragmentos.
 
-Esta estrategia es el resultado de la evaluación de la clase 9, en la que se compararon tres opciones. La opción A usaba solo búsqueda semántica, la B combinaba la búsqueda híbrida con RRF y la C añadía un reranker a la búsqueda híbrida. B y C obtuvieron las mismas métricas de recuperación (Precision@3, Recall@3, Hit@3 y RR) en los cuatro casos de desarrollo y en los dos de reserva, mientras que A quedó por debajo. Durante el desarrollo llegó a registrarse C por su menor latencia de generación. Al final, sin embargo, se eligió B, porque logra la misma calidad de recuperación sin el costo del reranker, que en esa evaluación llevó el tiempo promedio de recuperación de 454 ms a 1505 ms. Todo el detalle está en [`evidencias/Clase_09_Evidencia_Evaluacion_RAG.json`](evidencias/Clase_09_Evidencia_Evaluacion_RAG.json).
+Esta estrategia es el resultado de la evaluación de la clase 9, en la que se compararon tres opciones. La opción A usaba solo búsqueda semántica, la B combinaba la búsqueda híbrida con RRF y la C añadía un reranker a la búsqueda híbrida. B y C obtuvieron las mismas métricas de recuperación (Precision@3, Recall@3, Hit@3 y RR) en los cuatro casos de desarrollo y en los dos de reserva. A, en cambio, quedó por debajo en los casos de desarrollo y solo las igualó en los de reserva. Durante el desarrollo llegó a registrarse C por su menor latencia de generación. Al final, sin embargo, se eligió B, porque logra la misma calidad de recuperación sin el costo del reranker, que en esa evaluación llevó el tiempo promedio de recuperación de 454 ms a 1505 ms. Todo el detalle está en [`evidencias/Clase_09_Evidencia_Evaluacion_RAG.json`](evidencias/Clase_09_Evidencia_Evaluacion_RAG.json).
 
 ### Cómo se recupera o se actualiza el corpus
 
@@ -168,7 +168,7 @@ Si los textos no cambiaron, la aplicación no modifica nada y ni siquiera carga 
 
 | | MCP propio | MCP externo |
 |---|---|---|
-| Procedencia | [`app/servidor_mcp.py`](app/servidor_mcp.py), desarrollado en [`notebook_clase_11`](app/notenooks/asistente_normativo_RAG_agente_MCP.ipynb) | Paquete npm `normativa-colombia-mcp`, en la versión fija `1.16.1` |
+| Procedencia | [`app/servidor_mcp.py`](app/servidor_mcp.py), desarrollado en el notebook [`asistente_normativo_RAG_agente_MCP.ipynb`](notebooks/asistente_normativo_RAG_agente_MCP.ipynb) | Paquete npm `normativa-colombia-mcp`, en la versión fija `1.16.1` |
 | Transporte | stdio, ejecutado con el Python de `.venv` | stdio, ejecutado con el Node.js de `.venv` (`nodejs-wheel`) |
 | Herramientas habilitadas | `consultar_estado_proceso`, que recibe un código `P-` seguido de 11 dígitos | `buscar_jurisprudencia` y `linea_jurisprudencial`, ambas de la Corte Constitucional |
 | Permisos | Solo lectura sobre diez procesos ficticios en memoria | Solo lectura. Se inicia con `FUENTES=corte`, y la aplicación rechaza cualquier otra herramienta del catálogo |
@@ -243,7 +243,7 @@ python3 -m venv .venv
 cp app/.env.ejemplo app/.env
 ```
 
-La instalación puede tardar varios minutos, ya que descarga PyTorch y otros paquetes tamaño considerable.
+La instalación puede tardar varios minutos, ya que descarga PyTorch y otros paquetes de tamaño considerable.
 
 ### 10.2. Configurar Supabase
 
@@ -261,7 +261,7 @@ Toda la configuración de Supabase se hace desde su panel web, sin instalar nada
    select id from auth.users where email = 'correo-de-la-cuenta-duena@ejemplo.com';
    ```
 
-7. Por último, haciendo clic en el botón  **Connect** (parte de arriba, con el proyecto seleccionado) se copian la **SUPABASE_URL** y la **SUPABASE_PUBLISHABLE_KEY**, que empieza por `sb_publishable_`. No se debe usar ni la clave secreta ni la `service_role`.
+7. Por último, haciendo clic en el botón **Connect** (parte de arriba, con el proyecto seleccionado) se copian la **SUPABASE_URL** y la **SUPABASE_PUBLISHABLE_KEY**, que empieza por `sb_publishable_`. No se debe usar ni la clave secreta ni la `service_role`.
 
 Si algún script falla a mitad de camino, lo mejor es leer el mensaje antes de volver a ejecutarlo, porque varios crean políticas que no pueden crearse dos veces.
 
@@ -298,19 +298,30 @@ Vale la pena aclarar que las cuentas que aparecen en `.env` sirven para hacer lo
 
 ## 12. Ejecución
 
-La aplicación se inicia desde la raíz del proyecto.
+Desde la raíz del proyecto, primero se activa el entorno virtual y luego se inicia la aplicación.
 
 ```powershell
 # Windows (PowerShell)
-.\.venv\Scripts\python.exe app/app.py
+# Activar el entorno virtual
+.\.venv\Scripts\Activate.ps1
+
+# Iniciar la aplicación
+python app/app.py
+
+# O con
+py app/app.py
 ```
 
 ```bash
 # Linux o macOS
-.venv/bin/python app/app.py
+# Activar el entorno virtual
+source .venv/bin/activate
+
+# Iniciar la aplicación
+python app/app.py
 ```
 
-Si el entorno virtual ya está activado (con `.venv\Scripts\Activate.ps1` o `source .venv/bin/activate`), basta con escribir `python app/app.py`. Da igual si se ejecuta desde la raíz o desde `app/`, porque las rutas se calculan a partir de la ubicación de los archivos.
+Da igual si se ejecuta desde la raíz o desde `app/`, porque las rutas se calculan a partir de la ubicación de los archivos.
 
 Mientras arranca, la consola muestra `Preparando el sistema…`, luego el estado del corpus (`Corpus sin cambios` o `Corpus: versión nueva`) y finalmente un resumen de lo que quedó listo. En ese punto ya se puede abrir **http://127.0.0.1:7860** e iniciar sesión con una cuenta de Supabase Auth. El primer arranque suele tardar más que los siguientes, ya que descarga el modelo de embeddings, instala el MCP externo y, si la instalación es nueva, construye el corpus.
 
@@ -402,36 +413,40 @@ Por último, hay que tener en cuenta que las trazas guardadas conservan las preg
 
 ```text
 IAG_asistente_normativo/
-├── README.md                       este archivo
-├── BITACORA_PROYECTO.md            bitácora unificada de los tres cortes
-├── preguntas-pruebas-manuales.md   preguntas de prueba manual y estados de error
-├── notebooks/                      notebooks de los cortes anteriores
+├── README.md                                   este archivo
+├── BITACORA_PROYECTO.md                        bitácora de la entrega final
+├── preguntas-pruebas-manuales.md               preguntas de prueba manual y estados de error
+├── presentación_corte2_asistente_normativo.pdf presentación del corte 2
+├── notebooks/                                  notebooks desarrollados durante el semestre
 │   ├── asistente_normativo_RAG_agente_MCP.ipynb   referencia de sistema.py
 │   ├── prototipo_asistente_normativo_corte2.ipynb origen de corpus.py
-│   └── los demás notebooks desarrollados durante el semestre
-├── evidencias/                     evidencias de las clases 7, 8, 9 y 11, y de la entrega final
-├── bitacoras/                      bitácora del corte 2 y capturas
+│   └── notebooks de las clases 3, 4, 6, 7 y 8
+├── evidencias/                                 evidencias de las clases 7, 8, 9 y 11, y de la entrega final
+├── bitacoras/                                  bitácoras de las clases 6, 9 y 11, plantilla y capturas
 └── app/
-    ├── app.py                      interfaz Gradio
-    ├── sistema.py                  coordinación del agente
-    ├── almacenamiento.py           historial por usuario en Supabase
-    ├── corpus.py                   construcción y versiones del corpus
-    ├── servidor_mcp.py             MCP propio
-    ├── requirements.txt
-    ├── .env.ejemplo
-    ├── pytest.ini
-    ├── presentacion_proyecto.pdf   presentación de la entrega final
-    ├── supabase/                   SQL de la clase 8, migraciones y README
-    └── pruebas/                    pruebas con pytest y README
+    ├── README.md                               contenido de la carpeta app/
+    ├── app.py                                  interfaz Gradio
+    ├── sistema.py                              coordinación del agente
+    ├── almacenamiento.py                       historial por usuario en Supabase
+    ├── corpus.py                               construcción y versiones del corpus
+    ├── servidor_mcp.py                         MCP propio
+    ├── requirements.txt                        dependencias con versiones fijas
+    ├── .env.ejemplo                            plantilla de variables de entorno
+    ├── pytest.ini                              configuración de pytest
+    ├── presentacion_proyecto.pdf               presentación de la entrega final
+    ├── supabase/                               SQL de la clase 8, migraciones y README
+    └── pruebas/                                pruebas con pytest y README
 ```
 
 Además de este README, el proyecto cuenta con otros documentos que amplían cada parte.
 
 | Documento | Contenido |
 |---|---|
-| [`BITACORA_PROYECTO.md`](BITACORA_PROYECTO.md) | Documentación de la entrega final, con las decisiones, los experimentos, las pruebas, los errores y las conclusiones. |
+| [`BITACORA_PROYECTO.md`](BITACORA_PROYECTO.md) | Bitácora de la entrega final, con los parámetros vigentes, los cambios y decisiones técnicas, los problemas resueltos, las pruebas y los aprendizajes. |
+| [`app/README.md`](app/README.md) | Descripción breve de cada archivo de la aplicación. |
 | [`app/presentacion_proyecto.pdf`](app/presentacion_proyecto.pdf) | Presentación de la entrega final. |
 | [`app/supabase/README.md`](app/supabase/README.md) | Estrategia de corpus compartido con historial privado y detalle de las migraciones. |
 | [`app/pruebas/README.md`](app/pruebas/README.md) | Guía para ejecutar las pruebas. |
 | [`preguntas-pruebas-manuales.md`](preguntas-pruebas-manuales.md) | Pruebas manuales de recorrido con el modelo y estados de error. |
 | [`evidencias/`](evidencias/) | Evidencias de las clases 7, 8, 9 y 11, y de la prueba de recorrido de la entrega final. |
+| [`bitacoras/`](bitacoras/) | Bitácoras de las clases 6, 9 y 11, con la plantilla y las capturas del corte 2. |
