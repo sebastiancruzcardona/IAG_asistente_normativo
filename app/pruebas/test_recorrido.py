@@ -11,9 +11,9 @@ permitida y falla técnica controlada.
 
 Consumen tokens de Groq y requieren GROQ_API_KEY y la cuenta de prueba A
 (PRUEBA_USUARIO_A_EMAIL/PASSWORD) en app/.env; si faltan, se omiten. Para
-excluirlas: pytest -m "not recorrido". Entre casos hay una pausa de 50 s
+excluirlas: pytest -m "not recorrido". Entre casos hay una pausa de 63 s
 (PRUEBA_PAUSA_SEGUNDOS) por el límite de tokens por minuto de Groq, así que
-tardan alrededor de 6 minutos y 25 segundos.
+tardan alrededor de 8 minutos.
 
 El resultado esperado y el observado de cada caso se guardan en
 evidencias/Entrega_Final_Recorrido.json antes de comprobarlos, para conservar
@@ -48,7 +48,7 @@ ARCHIVO_EVIDENCIA = sistema.DIRECTORIO_APP.parent / "evidencias" / "Entrega_Fina
 # Pausa entre casos: el plan gratuito de Groq admite 8000 tokens por minuto y
 # cada decisión del agente usa cerca más de 2800. Sin pausa, los casos fallan por
 # límite de tasa (RateLimitError) y no por el comportamiento del agente
-PAUSA_SEGUNDOS = float(os.environ.get("PRUEBA_PAUSA_SEGUNDOS", "50"))
+PAUSA_SEGUNDOS = float(os.environ.get("PRUEBA_PAUSA_SEGUNDOS", "63"))
 
 # Estados de un turno completado por el agente
 COMPLETADOS = {"RESPONDER", "ACLARAR", "RECHAZAR"}
