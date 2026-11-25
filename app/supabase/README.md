@@ -126,4 +126,4 @@ cd app
 pytest pruebas/test_almacenamiento_rls.py -v
 ```
 
-`app/pruebas/test_corpus.py` comprueba que `corpus.py` reproduce los 63 fragmentos guardados (mismo texto y metadatos, y embeddings equivalentes) y que solo detecta cambios cuando cambia el texto.
+`app/pruebas/test_corpus.py` comprueba que `corpus.py` reproduce los fragmentos del corpus guardado (misma cantidad, texto y metadatos, y embeddings equivalentes) y que solo detecta cambios cuando cambia el texto.
