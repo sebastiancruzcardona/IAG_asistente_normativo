@@ -3,12 +3,11 @@
 !.env.ejemplo
 app/logs/
 .pytest_cache/
-AGENTS.md
 .gitignore
-.mcp.json
 .venv/
 __pycache__/
 *.pyc
 *.sqlite3*
-.claude
 Clase_12_Guia_Entrega_Final.md
+utilidades
+presentacion_proyecto.pptx
